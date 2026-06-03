@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Z-CITY ROLEPLAY | Loading</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    /* Reset & Basis */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 100%; 
+        height: 100%; 
+        overflow: hidden; 
+        background: #000; 
+        font-family: 'Roboto Condensed', Arial, sans-serif; 
+    }
+
+    /* ── Slideshow ────────────────── */
+    #slideshow { 
+        position: absolute; 
+        top: 0; left: 0; right: 0; bottom: 0;
+        z-index: 1; 
+    }
+    .slide {
+      position: absolute; 
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-size: cover; 
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: 0; 
+      transition: opacity 1.5s ease-in-out;
+    }
+    .slide.active { opacity: 1; }
+    
+    /* Bilder-Pfade */
+    #slide1 { background-image: url('assets/bg3.png'); }
+    #slide2 { background-image: url('assets/bg1.png'); }
+    #slide3 { background-image: url('assets/bg2.png'); }
+
+    /* Dunkles Overlay */
+    #overlay { 
+        position: absolute; 
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.6) 100%);
+        z-index: 2;
+    }
+
+    /* ── Info Panel ────────────────── */
+    #info-panel {
+      position: absolute;
+      top: 10%;
+      left: 60px;
+      z-index: 10;
+      color: #fff;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateX(-30px);
+      transition: all 1.2s ease-out;
+      max-width: 600px; 
+    }
+    #info-panel.visible { opacity: 1; transform: translateX(0); }
+
+    #info-panel h1 { 
+        font-size: 72px; 
+        font-weight: 700; 
+        line-height: 0.9; 
+        letter-spacing: -2px; 
+        text-shadow: 2px 2px 15px rgba(0,0,0,0.7);
+        margin-bottom: 20px;
+    }
+    #info-panel h1 span { color: #ff0000; } 
+    
+    #info-panel p { 
+        font-size: 18px; 
+        font-weight: 300; 
+        color: #ddd; 
+        letter-spacing: 1px;
+        text-shadow: 1px 1px 8px rgba(0,0,0,0.8);
+        text-transform: none;
+        line-height: 1.6;
+        background: rgba(0, 0, 0, 0.4);
+        padding: 15px;
+        border-left: 4px solid #ff0000;
+    }
+  </style>
+</head>
+<body>
+
+  <audio id="bg-music" loop></audio>
+
+  <div id="slideshow">
+    <div id="slide1" class="slide active"></div>
+    <div id="slide2" class="slide"></div>
+    <div id="slide3" class="slide"></div>
+  </div>
+
+  <div id="overlay"></div>
+
+  <div id="info-panel">
+    <h1>Z-CITY<br><span>ROLEPLAY</span></h1>
+    <p>
+      Based on 1942rp, we made a CityRP set in 1942 featuring Z-City, along with a lot of hyper-realistic trains from Metrostroi.
+      We focus on realism, SeriousRP, and the quality of the roleplay.
+    </p>
+  </div>
+
+  <script>
+    // Konfiguration
+    var audioFiles = ['assets/theme.ogg', 'assets/theme2.ogg'];
+    var audio = document.getElementById('bg-music');
+    
+    // Zufälligen Song auswählen
+    var randomSong = audioFiles[Math.floor(Math.random() * audioFiles.length)];
+    audio.src = randomSong;
+    audio.volume = 0.3;
+
+    function tryPlayMusic() {
+      audio.play().catch(function(e) { 
+        console.log("Autoplay von Browser blockiert - warte auf Interaktion oder GMod Event"); 
+      });
+    }
+
+    // Wenn die Seite geladen ist
+    window.onload = function() {
+      setTimeout(function(){
+        document.getElementById('info-panel').classList.add('visible');
+        tryPlayMusic();
+      }, 500);
+    };
+
+    // Slideshow Logik
+    var slides = document.querySelectorAll('.slide');
+    var cur = 0;
+    setInterval(function(){
+      slides[cur].classList.remove('active');
+      cur = (cur + 1) % slides.length;
+      slides[cur].classList.add('active');
+    }, 6000);
+
+    // GMod spezifische Funktion: Startet Musik, sobald Daten vom Server kommen
+    function SetStatusChanged( status ) {
+        if(status.indexOf("Getting host info") !== -1 || status.indexOf("Sending client info") !== -1) {
+            tryPlayMusic();
+        }
+    }
+  </script>
+</body>
+</html>
