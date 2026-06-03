@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Z-CITY ROLEPLAY | Loading</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet" />
   <style>
+    /* Reset & Basis */
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { 
         width: 100%; 
@@ -31,13 +33,10 @@
     }
     .slide.active { opacity: 1; }
     
-    /* 
-      BILDER: Lege deine Bilder in denselben Ordner wie diese index.html
-      Beispiel: loading/index.html + loading/bg1.jpg usw.
-    */
-    #slide1 { background-image: url('bg1.jpg'); }
-    #slide2 { background-image: url('bg2.jpg'); }
-    #slide3 { background-image: url('bg3.jpg'); }
+    /* Bilder-Pfade */
+    #slide1 { background-image: url('assets/bg3.jpg'); }
+    #slide2 { background-image: url('assets/bg1.jpg'); }
+    #slide3 { background-image: url('assets/bg2.jpg'); }
 
     /* Dunkles Overlay */
     #overlay { 
@@ -51,31 +50,29 @@
     #info-panel {
       position: absolute;
       top: 10%;
-      left: 5%;
+      left: 60px;
       z-index: 10;
       color: #fff;
       text-transform: uppercase;
       opacity: 0;
       transform: translateX(-30px);
       transition: all 1.2s ease-out;
-      width: 90%; 
       max-width: 600px; 
     }
     #info-panel.visible { opacity: 1; transform: translateX(0); }
 
     #info-panel h1 { 
-        font-size: clamp(40px, 6vw, 72px);
+        font-size: 72px; 
         font-weight: 700; 
         line-height: 0.9; 
         letter-spacing: -2px; 
         text-shadow: 2px 2px 15px rgba(0,0,0,0.7);
         margin-bottom: 20px;
-        word-wrap: break-word;
     }
     #info-panel h1 span { color: #ff0000; } 
     
     #info-panel p { 
-        font-size: clamp(14px, 2vw, 18px);
+        font-size: 18px; 
         font-weight: 300; 
         color: #ddd; 
         letter-spacing: 1px;
@@ -85,47 +82,11 @@
         background: rgba(0, 0, 0, 0.4);
         padding: 15px;
         border-left: 4px solid #ff0000;
-        word-wrap: break-word;
-    }
-
-    /* ── Ladebalken ────────────────── */
-    #progress-bar-wrapper {
-      position: absolute;
-      bottom: 40px;
-      left: 5%;
-      width: 90%;
-      z-index: 10;
-      opacity: 0;
-      transition: opacity 1s ease-out 0.5s;
-    }
-    #progress-bar-wrapper.visible { opacity: 1; }
-
-    #progress-label {
-      color: #aaa;
-      font-size: 12px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-    }
-    #progress-track {
-      width: 100%;
-      height: 3px;
-      background: rgba(255,255,255,0.15);
-    }
-    #progress-fill {
-      height: 3px;
-      width: 0%;
-      background: #ff0000;
-      transition: width 0.3s ease-out;
     }
   </style>
 </head>
 <body>
 
-  <!-- 
-    AUDIO: Lege deine .ogg oder .mp3 Dateien in denselben Ordner.
-    Beispiel: theme.ogg, theme1.ogg
-  -->
   <audio id="bg-music" loop></audio>
 
   <div id="slideshow">
@@ -139,76 +100,50 @@
   <div id="info-panel">
     <h1>Z-CITY<br><span>ROLEPLAY</span></h1>
     <p>
-      Willkommen auf Z-City Roleplay. Server lädt – bitte warten.
+      Based on 1942rp, we made a CityRP set in 1942 featuring Z-City, along with a lot of hyper-realistic trains from Metrostroi.
+      We focus on realism, SeriousRP, and the quality of the roleplay.
     </p>
   </div>
 
-  <div id="progress-bar-wrapper">
-    <div id="progress-label">Verbinde mit Server...</div>
-    <div id="progress-track">
-      <div id="progress-fill"></div>
-    </div>
-  </div>
-
   <script>
-    // ── Audio ──────────────────────────────────────────────
-    // Dateien im selben Ordner wie index.html ablegen
-    var audioFiles = ['theme.ogg', 'theme1.ogg'];
+    // Konfiguration
+    var audioFiles = ['assets/theme.ogg', 'assets/theme1.ogg'];
     var audio = document.getElementById('bg-music');
-    audio.src = audioFiles[Math.floor(Math.random() * audioFiles.length)];
+    
+    // Zufälligen Song auswählen
+    var randomSong = audioFiles[Math.floor(Math.random() * audioFiles.length)];
+    audio.src = randomSong;
     audio.volume = 0.3;
 
     function tryPlayMusic() {
-      var p = audio.play();
-      if (p !== undefined) {
-        p.catch(function() { /* Browser blockiert Autoplay – wartet auf Interaktion */ });
-      }
+      audio.play().catch(function(e) { 
+        console.log("Autoplay von Browser blockiert - warte auf Interaktion oder GMod Event"); 
+      });
     }
 
-    // ── Panel & Ladebalken einblenden ──────────────────────
+    // Wenn die Seite geladen ist
     window.onload = function() {
-      setTimeout(function() {
+      setTimeout(function(){
         document.getElementById('info-panel').classList.add('visible');
-        document.getElementById('progress-bar-wrapper').classList.add('visible');
         tryPlayMusic();
       }, 500);
     };
 
-    // ── Slideshow ──────────────────────────────────────────
+    // Slideshow Logik
     var slides = document.querySelectorAll('.slide');
     var cur = 0;
-    setInterval(function() {
+    setInterval(function(){
       slides[cur].classList.remove('active');
       cur = (cur + 1) % slides.length;
       slides[cur].classList.add('active');
     }, 6000);
 
-    // ── GMod Ladefortschritt ───────────────────────────────
-    var fill  = document.getElementById('progress-fill');
-    var label = document.getElementById('progress-label');
-
-    // GMod ruft diese Funktion mit einem Statustext auf
-    function SetStatusChanged(status) {
-      tryPlayMusic();
-
-      // Status-Text anzeigen
-      label.textContent = status;
-
-      // Fortschritt anhand bekannter GMod-Phasen schätzen
-      if (status.indexOf('Connecting') !== -1)           fill.style.width = '10%';
-      else if (status.indexOf('Getting host info') !== -1) fill.style.width = '25%';
-      else if (status.indexOf('Sending client info') !== -1) fill.style.width = '45%';
-      else if (status.indexOf('Downloading') !== -1)     fill.style.width = '65%';
-      else if (status.indexOf('Sending') !== -1)         fill.style.width = '80%';
-      else if (status.indexOf('Done') !== -1) {
-        fill.style.width = '100%';
-        label.textContent = 'Bereit!';
-      }
+    // GMod spezifische Funktion: Startet Musik, sobald Daten vom Server kommen
+    function SetStatusChanged( status ) {
+        if(status.indexOf("Getting host info") !== -1 || status.indexOf("Sending client info") !== -1) {
+            tryPlayMusic();
+        }
     }
-
-    // Fallback: Interaktionen nutzen um Audio zu starten
-    window.addEventListener('message', tryPlayMusic);
-    document.addEventListener('click',  tryPlayMusic);
   </script>
 </body>
 </html>
