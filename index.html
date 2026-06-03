@@ -33,10 +33,10 @@
     }
     .slide.active { opacity: 1; }
     
-    /* Bilder-Pfade */
-    #slide1 { background-image: url('assets/bg3.jpg'); }
-    #slide2 { background-image: url('assets/bg1.jpg'); }
-    #slide3 { background-image: url('assets/bg2.jpg'); }
+    /* Bilder-Pfade: HIER ABSOLUTE URLS EINTRAGEN (https://...) */
+    #slide1 { background-image: url('https://DEINE-DOMAIN.de/assets/bg3.jpg'); }
+    #slide2 { background-image: url('https://DEINE-DOMAIN.de/assets/bg1.jpg'); }
+    #slide3 { background-image: url('https://DEINE-DOMAIN.de/assets/bg2.jpg'); }
 
     /* Dunkles Overlay */
     #overlay { 
@@ -50,29 +50,31 @@
     #info-panel {
       position: absolute;
       top: 10%;
-      left: 60px;
+      left: 5%; /* Relativer Abstand für kleinere Bildschirme */
       z-index: 10;
       color: #fff;
       text-transform: uppercase;
       opacity: 0;
       transform: translateX(-30px);
       transition: all 1.2s ease-out;
+      width: 90%; 
       max-width: 600px; 
     }
     #info-panel.visible { opacity: 1; transform: translateX(0); }
 
     #info-panel h1 { 
-        font-size: 72px; 
+        font-size: clamp(40px, 6vw, 72px); /* Passt sich der Bildschirmgröße an */
         font-weight: 700; 
         line-height: 0.9; 
         letter-spacing: -2px; 
         text-shadow: 2px 2px 15px rgba(0,0,0,0.7);
         margin-bottom: 20px;
+        word-wrap: break-word; /* Verhindert Abschneiden */
     }
     #info-panel h1 span { color: #ff0000; } 
     
     #info-panel p { 
-        font-size: 18px; 
+        font-size: clamp(14px, 2vw, 18px);
         font-weight: 300; 
         color: #ddd; 
         letter-spacing: 1px;
@@ -82,12 +84,13 @@
         background: rgba(0, 0, 0, 0.4);
         padding: 15px;
         border-left: 4px solid #ff0000;
+        word-wrap: break-word;
     }
   </style>
 </head>
 <body>
 
-  <audio id="bg-music" loop></audio>
+  <audio id="bg-music" loop autoplay></audio>
 
   <div id="slideshow">
     <div id="slide1" class="slide active"></div>
@@ -106,8 +109,8 @@
   </div>
 
   <script>
-    // Konfiguration
-    var audioFiles = ['assets/theme.ogg', 'assets/theme1.ogg'];
+    // Konfiguration - Auch hier idealerweise absolute URLs nutzen
+    var audioFiles = ['https://DEINE-DOMAIN.de/assets/theme.ogg', 'https://DEINE-DOMAIN.de/assets/theme1.ogg'];
     var audio = document.getElementById('bg-music');
     
     // Zufälligen Song auswählen
@@ -116,9 +119,13 @@
     audio.volume = 0.3;
 
     function tryPlayMusic() {
-      audio.play().catch(function(e) { 
-        console.log("Autoplay von Browser blockiert - warte auf Interaktion oder GMod Event"); 
-      });
+      // Wenn der Browser zickt, erzwingen wir den Play-Befehl
+      var playPromise = audio.play();
+      if (playPromise !== undefined) {
+          playPromise.catch(function(error) { 
+              console.log("Warte auf GMod Interaktion für Audio..."); 
+          });
+      }
     }
 
     // Wenn die Seite geladen ist
@@ -138,12 +145,17 @@
       slides[cur].classList.add('active');
     }, 6000);
 
-    // GMod spezifische Funktion: Startet Musik, sobald Daten vom Server kommen
+    // GMod spezifische Funktion
     function SetStatusChanged( status ) {
         if(status.indexOf("Getting host info") !== -1 || status.indexOf("Sending client info") !== -1) {
             tryPlayMusic();
         }
     }
+    
+    // Fallback: Manchmal schickt GMod Updates über andere Event-Listener
+    window.addEventListener('message', function(e) {
+        tryPlayMusic();
+    });
   </script>
 </body>
 </html>
