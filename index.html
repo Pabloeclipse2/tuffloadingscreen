@@ -113,12 +113,16 @@
     // Zufälligen Song auswählen
     var randomSong = audioFiles[Math.floor(Math.random() * audioFiles.length)];
     audio.src = randomSong;
-    audio.volume = 0.3;
+    audio.volume = 0.3; // Standard-Lautstärke
 
+    // Abspiel-Funktion
     function tryPlayMusic() {
-      audio.play().catch(function(e) { 
-        console.log("Autoplay von Browser blockiert - warte auf Interaktion oder GMod Event"); 
-      });
+      var promise = audio.play();
+      if (promise !== undefined) {
+          promise.catch(function(e) { 
+            console.log("Autoplay von Browser blockiert - warte auf GMod Event"); 
+          });
+      }
     }
 
     // Wenn die Seite geladen ist
@@ -138,12 +142,33 @@
       slides[cur].classList.add('active');
     }, 6000);
 
-    // GMod spezifische Funktion: Startet Musik, sobald Daten vom Server kommen
+    // NEU: Diese Funktion wird von GMod beim Laden offiziell aufgerufen!
+    // Sie umgeht fast immer die Autoplay-Sperre und übernimmt die Lautstärke der GMod-Einstellungen.
+    function GameDetails( servername, serverurl, mapname, maxplayers, steamid, gamemode, volume, language ) {
+        // GMod übergibt die eingestellte Ingame-Lautstärke
+        if (volume !== undefined && volume > 0) {
+            audio.volume = volume;
+        } else if (volume === 0) {
+            audio.volume = 0; // Spieler hat Musik stummgeschaltet
+        }
+        tryPlayMusic();
+    }
+
+    // GMod spezifische Funktion: Startet Musik bei Statusänderung
     function SetStatusChanged( status ) {
-        if(status.indexOf("Getting host info") !== -1 || status.indexOf("Sending client info") !== -1) {
+        // Wir versuchen es einfach bei JEDER Statusänderung, nicht nur bei bestimmten.
+        tryPlayMusic(); 
+    }
+
+    // Hardcore-Fix: Wir versuchen es jede Sekunde, bis das Spiel es endlich zulässt
+    var forcePlayInterval = setInterval(function() {
+        if (!audio.paused) {
+            // Musik läuft endlich! Wir können aufhören zu spammen.
+            clearInterval(forcePlayInterval);
+        } else {
             tryPlayMusic();
         }
-    }
+    }, 1000);
   </script>
 </body>
 </html>
