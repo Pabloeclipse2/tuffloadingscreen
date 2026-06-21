@@ -16,7 +16,7 @@
         font-family: 'Roboto Condensed', Arial, sans-serif; 
     }
 
-    /* ── Slideshow ────────────────── */
+    /* ── Hintergrundbild ────────────────── */
     #slideshow { 
         position: absolute; 
         top: 0; left: 0; right: 0; bottom: 0;
@@ -28,10 +28,8 @@
       background-size: cover; 
       background-position: center;
       background-repeat: no-repeat;
-      opacity: 0; 
-      transition: opacity 1.5s ease-in-out;
+      opacity: 1; /* Immer sichtbar */
     }
-    .slide.active { opacity: 1; }
     
     /* Bilder-Pfade */
     #slide1 { background-image: url('assets/bg3.jpg'); }
@@ -89,8 +87,6 @@
 
   <div id="slideshow">
     <div id="slide1" class="slide active"></div>
-    <div id="slide2" class="slide"></div>
-    <div id="slide3" class="slide"></div>
   </div>
 
   <div id="overlay"></div>
@@ -130,15 +126,6 @@
         tryPlayMusic();
       }, 500);
     };
-
-    // Slideshow Logik
-    var slides = document.querySelectorAll('.slide');
-    var cur = 0;
-    setInterval(function(){
-      slides[cur].classList.remove('active');
-      cur = (cur + 1) % slides.length;
-      slides[cur].classList.add('active');
-    }, 6000);
 
     // NEU: Diese Funktion wird von GMod beim Laden offiziell aufgerufen!
     // Sie umgeht fast immer die Autoplay-Sperre und übernimmt die Lautstärke der GMod-Einstellungen.
